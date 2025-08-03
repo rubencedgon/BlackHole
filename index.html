@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Agujero Negro de Partículas</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<script>
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+
+  const particles = [];
+  const totalParticles = 500;
+
+  class Particle {
+    constructor() {
+      this.reset();
+    }
+
+    reset() {
+      this.angle = Math.random() * 2 * Math.PI;
+      this.radius = 50 + Math.random() * (Math.min(canvas.width, canvas.height) / 2);
+      this.speed = 0.5 + Math.random();
+      this.size = 1 + Math.random() * 2;
+      this.color = `hsl(${Math.random() * 360}, 100%, 80%)`;
+    }
+
+    update() {
+      this.radius -= this.speed;
+      if (this.radius <= 5) this.reset();
+    }
+
+    draw() {
+      const x = centerX + this.radius * Math.cos(this.angle);
+      const y = centerY + this.radius * Math.sin(this.angle);
+      ctx.beginPath();
+      ctx.arc(x, y, this.size, 0, 2 * Math.PI);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+    }
+  }
+
+  for (let i = 0; i < totalParticles; i++) {
+    particles.push(new Particle());
+  }
+
+  function animate() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (let p of particles) {
+      p.update();
+      p.draw();
+    }
+
+    // dibuja el centro del agujero negro
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI);
+    ctx.fillStyle = "black";
+    ctx.fill();
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+</script>
+</body>
+</html>
